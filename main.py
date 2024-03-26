@@ -103,7 +103,7 @@ class Button(pygame.sprite.Sprite):
             if self.rect.colliderect(character.rect):
                 self.triggered = True
                 self.rect.y += self.height * 2/3
-                self.height /= 3
+                self.height //= 3
                 # Resize the button's image
                 self.image = pygame.transform.scale(self.original_image, (self.width, self.height))
                 self.last_pressed = pygame.time.get_ticks()
@@ -113,14 +113,15 @@ class Button(pygame.sprite.Sprite):
             if self.timed(pygame.time.get_ticks()):
                 self.last_pressed = None
                 self.triggered = False
-                self.image = self.original_image
-                self.rect = self.original_rect
-                self.height = self.original_height
-                self.rect.x = self.original_x
+                self.height *= 3
+                self.rect.y -= self.height * 2/3
+                # Resize the button's image back
+                self.image = pygame.transform.scale(self.original_image, (self.width, self.height))
 
     def timed(self, time):
         if time - self.last_pressed >= 2000:
             return True
+        return False
 
 
 # Create player object
