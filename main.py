@@ -16,6 +16,7 @@ BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
+BROWN = (139, 69, 19)
 
 # Player properties
 player_width = 50
@@ -26,6 +27,9 @@ gravity = 0.5
 
 # Platform properties
 platform_color = BLUE
+
+# Door properties
+door_color = BROWN
 
 # Create player class
 
@@ -119,9 +123,19 @@ class Button(pygame.sprite.Sprite):
                 self.image = pygame.transform.scale(self.original_image, (self.width, self.height))
 
     def timed(self, time):
-        if time - self.last_pressed >= 2000:
+        if time - self.last_pressed >= 5000:
             return True
         return False
+
+
+class Door(pygame.sprite.Sprite):
+    def __init__(self, x, y, width, height):
+        super().__init__()
+        self.image = pygame.Surface((width, height))
+        self.image.fill(door_color)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
 
 
 # Create player object
@@ -132,20 +146,37 @@ player = Player(100, screen_height - 70 - player_height)
 
 # Create platform objects
 platforms = pygame.sprite.Group()
-platform1 = Platform(0, screen_height - 70, screen_width, 100)
-platform2 = Platform(200, 700, 200, 5)
-platform3 = Platform(500, 800, 150, 5)
-platform4 = Platform(500, 800, 150, 5)
-platforms.add(platform1, platform2, platform3, platform4)
+platform_1 = Platform(0, screen_height - 70, screen_width, 100)
+platform_2 = Platform(200, 700, 200, 5)
+platform_3 = Platform(500, 800, 150, 5)
+platform_5 = Platform(875, 630, 100, 5)
 
+platforms.add(platform_1, platform_2, platform_3, platform_5)
+
+# Create secret platforms that appear when a button is pushed
+platforms_S = pygame.sprite.Group()
+platform_S_2 = Platform(650, 730, 50, 5)
+
+platforms_S.add(platform_S_2)
 
 # Create a button group and put the first button in
 buttons = pygame.sprite.Group()
 button0 = Button(250, 670, 20, 30, RED)
 buttons.add(button0)
 
+# Create a group of doors and put the door in it
+doors = pygame.sprite.Group()
+door1 = (Door(900, 530, 50, 100))
+doors.add(door1)
+
+
 # Main loop
 clock = pygame.time.Clock()
+
+# Module for writing initialization
+pygame.font.init()
+font_used = pygame.font.SysFont('Kanit', 30)
+text = font_used.render('Press "E" to open the door', False, BLACK)
 
 running = True
 t_launch = pygame.time.get_ticks()
@@ -172,12 +203,31 @@ while running:
             player.rect.bottom = platform.rect.top
             player.on_ground = True
             player.y_velocity = 0
+    platforms.draw(screen)
 
     t_act = t_launch - pygame.time.get_ticks()
     platforms.sprites()[0].rect.x -= t_act / 1000
     platforms.sprites()[0].rect.width -= t_act / 1000
 
     button0.touch_player(player)
+    # If button is pressed, the platforms spawn and it checks collisions
+    if button0.triggered:
+        collisions = pygame.sprite.spritecollide(player, platforms_S, False)
+        for platform in collisions:
+            if player.y_velocity > 0 and player.rect.bottom > platform.rect.top:
+                player.rect.bottom = platform.rect.top
+                player.on_ground = True
+                player.y_velocity = 0
+        platforms_S.draw(screen)
+
+    if door1.rect.colliderect(player.rect):
+        screen.blit(text, (player.rect.centerx - 125, player.rect.top - 120))
+        if keys[pygame.K_e]:
+            print("Level 2 launched")
+            # to Replace with the level change
+
+    doors.draw(screen)
+
     player.update()
     button0.update()
     if player.rect.y + player_height >= screen_height:
