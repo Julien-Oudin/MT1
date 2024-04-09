@@ -44,6 +44,9 @@ class Player(pygame.sprite.Sprite):
         self.rect.y = y
         self.y_velocity = 0
         self.on_ground = False
+        self.orientation = "E"
+        self.last_dash = 0
+        self.mini_dash = 0
 
     def update(self):
         self.y_velocity += gravity
@@ -63,6 +66,18 @@ class Player(pygame.sprite.Sprite):
         if self.on_ground:
             self.y_velocity = jump_strength
             self.on_ground = False
+
+    def dash(self):
+        if pygame.time.get_ticks() - self.last_dash >= 1500:
+            if self.orientation == "E":
+                player.rect.x += 15
+            elif self.orientation == "W":
+                player.rect.x -= 15
+            self.mini_dash += 1
+            if self.mini_dash == 10:
+                self.last_dash = pygame.time.get_ticks()
+        else:
+            self.mini_dash = 0
 
 # Create platform class
 
@@ -190,11 +205,17 @@ while running:
             if event.key == pygame.K_SPACE:
                 player.jump()
 
+    t_act = pygame.time.get_ticks() - t_launch
+
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
+    if keys[pygame.K_q]:
         player.rect.x -= 5
-    if keys[pygame.K_RIGHT]:
+        player.orientation = "W"
+    if keys[pygame.K_d]:
         player.rect.x += 5
+        player.orientation = "E"
+    if keys[pygame.K_LSHIFT]:
+        player.dash()
 
     # Check for collisions with platforms
     collisions = pygame.sprite.spritecollide(player, platforms, False)
@@ -205,7 +226,6 @@ while running:
             player.y_velocity = 0
     platforms.draw(screen)
 
-    t_act = t_launch - pygame.time.get_ticks()
     platforms.sprites()[0].rect.x -= t_act / 1000
     platforms.sprites()[0].rect.width -= t_act / 1000
 
