@@ -1,5 +1,6 @@
 import pygame
 import sys
+import datetime as dt
 
 # Initialize pygame
 pygame.init()
@@ -8,7 +9,7 @@ pygame.init()
 screen_width = 1600
 screen_height = 900
 screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("Hooked On This")
+pygame.display.set_caption("More than 1")
 
 # Colors
 WHITE = (255, 255, 255)
@@ -17,6 +18,14 @@ BLUE = (0, 0, 255)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BROWN = (139, 69, 19)
+
+# Default keyboard settings
+
+keys_user = {"left_key": pygame.K_q,
+             "right_key": pygame.K_d,
+             "dash_key": pygame.K_LSHIFT,
+             "jump_key": pygame.K_SPACE,
+             "enter_door_key": pygame.K_e}
 
 # Player properties
 player_width = 50
@@ -31,6 +40,9 @@ platform_color = BLUE
 # Door properties
 door_color = BROWN
 
+# Environment properties
+hour = dt.datetime.now().hour
+
 # Create player class
 
 
@@ -42,6 +54,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.speed = 5
         self.y_velocity = 0
         self.on_ground = False
         self.orientation = "E"
@@ -70,9 +83,9 @@ class Player(pygame.sprite.Sprite):
     def dash(self):
         if pygame.time.get_ticks() - self.last_dash >= 1500:
             if self.orientation == "E":
-                player.rect.x += 15
+                self.rect.x += 15
             elif self.orientation == "W":
-                player.rect.x -= 15
+                self.rect.x -= 15
             self.mini_dash += 1
             if self.mini_dash == 10:
                 self.last_dash = pygame.time.get_ticks()
@@ -184,8 +197,18 @@ doors = pygame.sprite.Group()
 door1 = (Door(900, 530, 50, 100))
 doors.add(door1)
 
+# Functions used in the game
 
-# Main loop
+
+def reverse():
+    tmp = keys_user["right_key"]
+    keys_user["right_key"] = keys_user["left_key"]
+    keys_user["left_key"] = tmp
+    tmp = keys_user["jump_key"]
+    keys_user["jump_key"] = keys_user["dash_key"]
+    keys_user["dash_key"] = tmp
+
+
 clock = pygame.time.Clock()
 
 # Module for writing initialization
@@ -193,6 +216,8 @@ pygame.font.init()
 font_used = pygame.font.SysFont('Kanit', 30)
 text = font_used.render('Press "E" to open the door', False, BLACK)
 
+
+# Main loop
 running = True
 t_launch = pygame.time.get_ticks()
 while running:
@@ -201,23 +226,22 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                player.jump()
 
     t_act = pygame.time.get_ticks() - t_launch
 
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_q]:
-        player.rect.x -= 5
+    if keys[keys_user["left_key"]]:
+        player.rect.x -= player.speed
         player.orientation = "W"
-    if keys[pygame.K_d]:
-        player.rect.x += 5
+    if keys[keys_user["right_key"]]:
+        player.rect.x += player.speed
         player.orientation = "E"
-    if keys[pygame.K_LSHIFT]:
+    if keys[keys_user["dash_key"]]:
         player.dash()
+    if keys[keys_user["jump_key"]]:
+        player.jump()
 
-    # Check for collisions with platforms
+# Check for collisions with platforms
     collisions = pygame.sprite.spritecollide(player, platforms, False)
     for platform in collisions:
         if player.y_velocity > 0 and player.rect.bottom > platform.rect.top:
@@ -225,9 +249,6 @@ while running:
             player.on_ground = True
             player.y_velocity = 0
     platforms.draw(screen)
-
-    platforms.sprites()[0].rect.x -= t_act / 1000
-    platforms.sprites()[0].rect.width -= t_act / 1000
 
     button0.touch_player(player)
     # If button is pressed, the platforms spawn and it checks collisions
@@ -242,7 +263,7 @@ while running:
 
     if door1.rect.colliderect(player.rect):
         screen.blit(text, (player.rect.centerx - 125, player.rect.top - 120))
-        if keys[pygame.K_e]:
+        if keys_user["enter_door_key"]:
             print("Level 2 launched")
             # to Replace with the level change
 
@@ -255,7 +276,6 @@ while running:
     platforms.draw(screen)
     buttons.draw(screen)
     screen.blit(player.image, player.rect)
-
     pygame.display.flip()
     clock.tick(60)
 
