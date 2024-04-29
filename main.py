@@ -18,6 +18,7 @@ BLUE = (0, 0, 255)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BROWN = (139, 69, 19)
+GRAY = (128, 128, 128)
 
 # Default keyboard settings
 
@@ -52,14 +53,18 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.Surface((player_width, player_height))
         self.image.fill(player_color)
         self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        self.rect.x = self.spawn_x = x
+        self.rect.y = self.spawn_y = y
         self.speed = 5
         self.y_velocity = 0
         self.on_ground = False
         self.orientation = "E"
         self.last_dash = 0
         self.mini_dash = 0
+
+    def spawn(self):
+        self.rect.x = self.spawn_x
+        self.rect.y = self.spawn_y
 
     def update(self):
         self.y_velocity += gravity
@@ -121,6 +126,7 @@ class Button(pygame.sprite.Sprite):
         self.height = height
         self.triggered = False
         self.last_pressed = None
+        self.t_activation = 5000
 
     def update(self):
         self.reset_image()
@@ -151,9 +157,11 @@ class Button(pygame.sprite.Sprite):
                 self.image = pygame.transform.scale(self.original_image, (self.width, self.height))
 
     def timed(self, time):
-        if time - self.last_pressed >= 5000:
+        if time - self.last_pressed >= self.t_activation:
             return True
         return False
+
+# Create class Door that is the goal of the level
 
 
 class Door(pygame.sprite.Sprite):
@@ -164,6 +172,54 @@ class Door(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+
+
+# Create a spikes class, each object will be linked to a platform
+
+
+class Spikes(pygame.sprite.Sprite):
+    def __init__(self, sub_platform, length, height, dis_trigger):
+        super().__init__()
+        self.sub_platform = sub_platform
+        self.height = height
+        self.length_spike = length
+        self.dis_trigger = dis_trigger
+        self.border_distance = (self.sub_platform.rect.width % self.length_spike)
+        self.rect = pygame.Rect(self.sub_platform.rect.x,
+                                self.sub_platform.rect.y - self.height,
+                                self.sub_platform.rect.width - self.border_distance,
+                                self.height)
+        self.rect_trigger = pygame.Rect(self.rect.x - self.dis_trigger,
+                                        self.sub_platform.rect.y - self.dis_trigger,
+                                        self.sub_platform.rect.width + self.dis_trigger * 1.5,
+                                        self.height + self.dis_trigger)
+        self.nb_spikes = self.sub_platform.rect.width // self.length_spike
+        self.t_activated = 0
+        self.t_activation = 5000
+        self.triggered = False
+
+        # Here the rectangle is for the whole set of spikes
+
+    def activated(self, rect_player):
+        if self.rect_trigger.colliderect(rect_player) or self.triggered:
+            if not self.triggered:
+                self.triggered = True
+                self.t_activated = pygame.time.get_ticks() - t_launch
+            else:
+                if (pygame.time.get_ticks() - t_launch) - self.t_activated >= self.t_activation:
+                    return False
+            return True
+
+    def draw(self):
+        for i in range(self.nb_spikes):
+            # In order : Top, left, right
+            spike_corners = [(self.rect.x + ((i+0.5)*self.length_spike) + self.border_distance / 2,
+                              self.rect.y - self.height),
+                             ((self.rect.x + (i * self.length_spike)) + self.border_distance / 2,
+                              self.sub_platform.rect.y + 1),
+                             (self.rect.x + ((i+1)*self.length_spike) + self.border_distance/2,
+                              self.sub_platform.rect.y + 1)]
+            pygame.draw.polygon(screen, GRAY, spike_corners)
 
 
 # Create player object
@@ -183,9 +239,9 @@ platforms.add(platform_1, platform_2, platform_3, platform_5)
 
 # Create secret platforms that appear when a button is pushed
 platforms_S = pygame.sprite.Group()
-platform_S_2 = Platform(650, 730, 50, 5)
+platform_S_1 = Platform(650, 730, 50, 5)
 
-platforms_S.add(platform_S_2)
+platforms_S.add(platform_S_1)
 
 # Create a button group and put the first button in
 buttons = pygame.sprite.Group()
@@ -196,6 +252,11 @@ buttons.add(button0)
 doors = pygame.sprite.Group()
 door1 = (Door(900, 530, 50, 100))
 doors.add(door1)
+
+# Create a group of spikes and puts the first one in it
+spikes_group = pygame.sprite.Group()
+spikes1 = Spikes(platform_5, 20, 30, 220)
+spikes_group.add(spikes1)
 
 # Functions used in the game
 
@@ -248,7 +309,14 @@ while running:
             player.rect.bottom = platform.rect.top
             player.on_ground = True
             player.y_velocity = 0
-    platforms.draw(screen)
+
+    for spike in spikes_group.sprites():
+        if spike.activated(player.rect):
+            spike.draw()
+            if spike.rect.colliderect(player.rect):
+                player.spawn()
+                spike.t_activated = t_act
+                spike.triggered = False
 
     button0.touch_player(player)
     # If button is pressed, the platforms spawn and it checks collisions
@@ -263,21 +331,19 @@ while running:
 
     if door1.rect.colliderect(player.rect):
         screen.blit(text, (player.rect.centerx - 125, player.rect.top - 120))
-        if keys_user["enter_door_key"]:
-            print("Level 2 launched")
-            # to Replace with the level change
-
-    doors.draw(screen)
+    # if keys_user["enter_door_key"]:
+        # to Replace with the level change
 
     player.update()
     button0.update()
-    if player.rect.y + player_height >= screen_height:
-        running = False
-    platforms.draw(screen)
     buttons.draw(screen)
+    platforms.draw(screen)
+    doors.draw(screen)
     screen.blit(player.image, player.rect)
     pygame.display.flip()
     clock.tick(60)
+    if player.rect.y + player_height >= screen_height:
+        running = False
 
 pygame.quit()
 sys.exit()
