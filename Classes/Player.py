@@ -5,8 +5,11 @@ import pygame
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, screen_height):
         super().__init__()
-        self.image = pygame.image.load("Images\Player.png")
-        self.image = pygame.transform.scale(self.image, (40, 100))
+        self.li_images = ["Images\Player1.png", "Images\Player2.png", "Images\Player1.png", "Images\Player3.png"]
+        for i in range(len(self.li_images)):
+            self.li_images[i] = pygame.transform.scale(pygame.image.load(self.li_images[i]), (40, 100))
+        self.state_im = 0
+        self.image = self.li_images[self.state_im]
         self.rect = self.image.get_rect()
         self.rect.x = self.spawn_x = x
         self.rect.y = self.spawn_y = y
@@ -19,6 +22,7 @@ class Player(pygame.sprite.Sprite):
         self.last_dash = 0
         self.mini_dash = 0
         self.screen_height = screen_height
+        self.time = pygame.time.get_ticks()
 
     def spawn(self):
         self.rect.x = self.spawn_x
@@ -31,6 +35,14 @@ class Player(pygame.sprite.Sprite):
             self.rect.y = self.screen_height - self.rect.height
             self.on_ground = True
             self.y_velocity = 0
+        if pygame.time.get_ticks() - self.time > 150:
+            self.time = pygame.time.get_ticks()
+            self.state_im += 1
+            if self.state_im == 4:
+                self.state_im = 0
+            self.image = self.li_images[self.state_im]
+
+
 
     def jump(self):
         if self.on_ground:
