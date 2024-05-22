@@ -1,3 +1,4 @@
+import time
 import pygame
 import sys
 import datetime as dt
@@ -35,6 +36,16 @@ player_color = BLACK
 jump_strength = -12
 gravity = 0.5
 
+# Projectiles properties
+
+proj_size = 20
+proj_speed = 1
+projectile_step = 0
+projectile_trajectory = []
+
+# Initialisation of the state of the projectile
+projectile_launched = False
+
 # Platform properties
 platform_color = BLUE
 
@@ -50,8 +61,8 @@ hour = dt.datetime.now().hour
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.Surface((player_width, player_height))
-        self.image.fill(player_color)
+        self.image = pygame.image.load("Player.png")
+        self.image = pygame.transform.scale(self.image, (40, 100))
         self.rect = self.image.get_rect()
         self.rect.x = self.spawn_x = x
         self.rect.y = self.spawn_y = y
@@ -103,8 +114,8 @@ class Player(pygame.sprite.Sprite):
 class Platform(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
         super().__init__()
-        self.image = pygame.Surface((width, height))
-        self.image.fill(platform_color)
+        self.image = pygame.image.load("Platform.png")
+        self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -165,10 +176,10 @@ class Button(pygame.sprite.Sprite):
 
 
 class Door(pygame.sprite.Sprite):
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.Surface((width, height))
-        self.image.fill(door_color)
+        self.image = pygame.image.load("Closed_door.png")
+        self.image = pygame.transform.scale(self.image, (40, 100))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -222,41 +233,105 @@ class Spikes(pygame.sprite.Sprite):
             pygame.draw.polygon(screen, GRAY, spike_corners)
 
 
+class Canon(pygame.sprite.Sprite):
+
+    def __init__(self, sub_platform, length, height, dis_trigger):
+        super().__init__()
+        projectile_x = length
+        projectile_y = screen_height // 2 - proj_size // 2
+        projectile_step = 0
+        projectile_trajectory = []
+        pass
+
 # Create player object
 
 
 player = Player(100, screen_height - 70 - player_height)
 
+# Create global variables that will be used to create the levels
 
 # Create platform objects
-platforms = pygame.sprite.Group()
-platform_1 = Platform(0, screen_height - 70, screen_width, 100)
-platform_2 = Platform(200, 700, 200, 5)
-platform_3 = Platform(500, 800, 150, 5)
-platform_5 = Platform(875, 630, 100, 5)
 
-platforms.add(platform_1, platform_2, platform_3, platform_5)
+platforms = pygame.sprite.Group()
 
 # Create secret platforms that appear when a button is pushed
 platforms_S = pygame.sprite.Group()
-platform_S_1 = Platform(650, 730, 50, 5)
 
-platforms_S.add(platform_S_1)
+# Create a button group and one for the activation
 
-# Create a button group and put the first button in
 buttons = pygame.sprite.Group()
-button0 = Button(250, 670, 20, 30, RED)
-buttons.add(button0)
+buttons_arr_act = []
 
 # Create a group of doors and put the door in it
+
 doors = pygame.sprite.Group()
-door1 = (Door(900, 530, 50, 100))
-doors.add(door1)
 
 # Create a group of spikes and puts the first one in it
 spikes_group = pygame.sprite.Group()
-spikes1 = Spikes(platform_5, 20, 30, 220)
-spikes_group.add(spikes1)
+
+# Function to load level 1
+
+
+def load_level_1():
+    global player, platforms, platforms_S, buttons, doors, spikes_group, t_launch, buttons_arr_act
+    player.spawn()
+    platforms = pygame.sprite.Group()
+    platform_1 = Platform(0, screen_height - 70, screen_width, 100)  #Ground
+    platform_2 = Platform(200, 700, 200, 5)
+    platform_3 = Platform(500, 800, 150, 5)
+    platform_4 = Platform(875, 630, 100, 5)
+    platforms.add(platform_1, platform_2, platform_3, platform_4)
+    platforms_S = pygame.sprite.Group()
+    platform_S_1 = Platform(650, 730, 50, 5)
+    platforms_S.add(platform_S_1)
+    buttons = pygame.sprite.Group()
+    button0 = Button(250, 670, 20, 30, RED)
+    buttons_arr_act = []
+    buttons.add(button0)
+    doors = pygame.sprite.Group()
+    door1 = Door(900, 530)
+    doors.add(door1)
+    spikes_group = pygame.sprite.Group()
+    spikes1 = Spikes(platform_4, 20, 30, 220)
+    spikes_group.add(spikes1)
+    t_launch = pygame.time.get_ticks()
+
+# Function to load level 2
+
+
+def load_level_2():
+    global player, platforms, platforms_S, buttons, doors, spikes_group, t_launch
+    player.spawn()
+    platforms = pygame.sprite.Group()
+    platform_1 = Platform(0, screen_height - 70, screen_width, 100)
+    platform_2 = Platform(300, 600, 200, 5)
+    platform_3 = Platform(600, 700, 150, 5)
+    platforms.add(platform_1, platform_2, platform_3)
+    platforms_S = pygame.sprite.Group()
+    platform_S_1 = Platform(750, 650, 50, 5)
+    platforms_S.add(platform_S_1)
+    buttons = pygame.sprite.Group()
+    button0 = Button(350, 570, 20, 30, RED)
+    buttons_arr_act = []
+    buttons.add(button0)
+    doors = pygame.sprite.Group()
+    door1 = Door(900, 500)
+    doors.add(door1)
+    spikes_group = pygame.sprite.Group()
+    spikes1 = Spikes(platform_3, 20, 30, 220)
+    spikes_group.add(spikes1)
+    t_launch = pygame.time.get_ticks()
+
+
+# List of levels
+
+
+levels = [load_level_1, load_level_2]
+current_level = 0
+
+# Load the first level
+levels[current_level]()
+
 
 # Functions used in the game
 
@@ -318,24 +393,44 @@ while running:
                 spike.t_activated = t_act
                 spike.triggered = False
 
-    button0.touch_player(player)
-    # If button is pressed, the platforms spawn and it checks collisions
-    if button0.triggered:
-        collisions = pygame.sprite.spritecollide(player, platforms_S, False)
-        for platform in collisions:
-            if player.y_velocity > 0 and player.rect.bottom > platform.rect.top:
-                player.rect.bottom = platform.rect.top
-                player.on_ground = True
-                player.y_velocity = 0
-        platforms_S.draw(screen)
+    i = 0
+    for button in buttons:
+        button.touch_player(player)
+        buttons_arr_act.append(button.triggered)
+        i += 1
+    '''
+    platforms_activated = 1
+        # If buttons are pressed, the platforms spawn and it checks collisions
+    for i in range(len(buttons_arr_act)):
+        if buttons_arr_act[i] == 0:
+            platforms_activated = 0
+    '''
+    for i in range(len(buttons_arr_act)):
+        if buttons_arr_act[i]:
+            collisions = pygame.sprite.spritecollide(player, platforms_S, False)
+            for platform in collisions:
+                if player.y_velocity > 0 and player.rect.bottom > platform.rect.top:
+                    player.rect.bottom = platform.rect.top
+                    player.on_ground = True
+                    player.y_velocity = 0
+            platforms_S.draw(screen)
 
-    if door1.rect.colliderect(player.rect):
-        screen.blit(text, (player.rect.centerx - 125, player.rect.top - 120))
-    # if keys_user["enter_door_key"]:
-        # to Replace with the level change
+    for door in doors:
+        if door.rect.colliderect(player.rect):
+            screen.blit(text, (player.rect.centerx - 125, player.rect.top - 120))
+            if keys_user["enter_door_key"]:
+                door.image = pygame.image.load("Opened_Door.png")
+                door.image = pygame.transform.scale(door.image, (100, 100))
+                ################################################################################################################## PLAY SOUND WIN
+                current_level += 1
+                if current_level < len(levels):
+                    levels[current_level]()
+                else:
+                    ###################################################### END
+                    running = False
 
     player.update()
-    button0.update()
+    buttons.update()
     buttons.draw(screen)
     platforms.draw(screen)
     doors.draw(screen)
@@ -343,7 +438,7 @@ while running:
     pygame.display.flip()
     clock.tick(60)
     if player.rect.y + player_height >= screen_height:
-        running = False
+        player.spawn()
 
 pygame.quit()
 sys.exit()
