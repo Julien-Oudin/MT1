@@ -1,11 +1,12 @@
 import pygame
 import sys
 import datetime as dt
-from Player import Player
-from Platform import Platform
-from Button import Button
-from Door import Door
-from Spikes import Spikes
+from Classes.Player import Player
+from Classes.Platform import Platform
+from Classes.Button import Button
+from Classes.Door import Door
+from Classes.Spikes import Spikes
+
 # from Canon import Canon
 
 # Initialize pygame
@@ -37,10 +38,8 @@ keys_user = {"left_key": pygame.K_q,
 # Initialisation of the state of the projectile
 projectile_launched = False
 
-
 # Environment properties
 hour = dt.datetime.now().hour
-
 
 # Create player object
 
@@ -65,6 +64,7 @@ doors = pygame.sprite.Group()
 
 # Create a group of spikes and puts the first one in it
 spikes_group = pygame.sprite.Group()
+
 
 # Function to load level 1
 
@@ -92,6 +92,7 @@ def load_level_1():
     spikes1 = Spikes(platform_4, 20, 30, 220, screen)
     spikes_group.add(spikes1)
     t_launch = pygame.time.get_ticks()
+
 
 # Function to load level 2
 
@@ -149,6 +150,12 @@ pygame.font.init()
 font_used = pygame.font.SysFont('Kanit', 30)
 text = font_used.render('Press "E" to open the door', False, BLACK)
 
+# Music module
+
+music_loop = ["music\main_title1.mp3", "music\main_title2.mp3", "music\main_title3.mp3", "music\main_title4.mp3"]
+music_state = 0
+pygame.mixer.music.load(music_loop[music_state])
+pygame.mixer.music.play()
 
 # Main loop
 running = True
@@ -174,7 +181,7 @@ while running:
     if keys[keys_user["jump_key"]]:
         player.jump()
 
-# Check for collisions with platforms
+    # Check for collisions with platforms
     collisions = pygame.sprite.spritecollide(player, platforms, False)
     for platform in collisions:
         if player.y_velocity > 0 and player.rect.bottom > platform.rect.top:
@@ -216,16 +223,18 @@ while running:
         if door.rect.colliderect(player.rect):
             screen.blit(text, (player.rect.centerx - 125, player.rect.top - 120))
             if keys_user["enter_door_key"]:
-                door.image = pygame.image.load("Opened_Door.png")
+                door.image = pygame.image.load("Images\Opened_Door.png")
                 door.image = pygame.transform.scale(door.image, (100, 100))
-                ################################################################################################################## PLAY SOUND WIN
+                pygame.mixer_music.stop()
+                pygame.mixer.music.load("music\win.mp3")
+                pygame.mixer.music.play()
+                music_state += 1
                 current_level += 1
                 if current_level < len(levels):
                     levels[current_level]()
                 else:
                     ###################################################### END
                     running = False
-
     player.update()
     buttons.update()
     buttons.draw(screen)
@@ -233,6 +242,11 @@ while running:
     doors.draw(screen)
     screen.blit(player.image, player.rect)
     pygame.display.flip()
+    if not pygame.mixer.music.get_busy():
+        music_state += 1
+        if music_state > 3:
+            music_state = 0
+        pygame.mixer.music.load(music_loop[music_state])
     clock.tick(60)
     if player.rect.y + player.rect.height >= screen_height:
         player.spawn()
