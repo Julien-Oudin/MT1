@@ -16,6 +16,8 @@ move to the left -Q
 
 move to the right - D
 
+Open the door - E
+
 # Install instructions
 
 1. Clone repository
