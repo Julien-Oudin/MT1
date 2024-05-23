@@ -152,6 +152,7 @@ def load_level_3():
     spikes_group.add(spikes1,spikes2)
     t_launch = pygame.time.get_ticks()
 
+
 def load_level_4():
     global player, platforms, platforms_S, buttons, doors, spikes_group, t_launch, buttons_arr_act
     player.spawn()
@@ -172,6 +173,7 @@ def load_level_4():
     door1 = Door(1350, 330)
     doors.add(door1)
     t_launch = pygame.time.get_ticks()
+
 
 def load_level_5():
     global player, platforms, platforms_S, buttons, doors, spikes_group, t_launch, buttons_arr_act
@@ -233,9 +235,9 @@ music_state = 0
 pygame.mixer.music.load(music_loop[music_state])
 pygame.mixer.music.play()
 
-
-
 # Main loop
+
+
 running = True
 t_launch = pygame.time.get_ticks()
 while running:
@@ -281,13 +283,7 @@ while running:
         button.touch_player(player)
         buttons_arr_act.append(button.triggered)
         i += 1
-    '''
-    platforms_activated = 1
-        # If buttons are pressed, the platforms spawn and it checks collisions
-    for i in range(len(buttons_arr_act)):
-        if buttons_arr_act[i] == 0:
-            platforms_activated = 0
-    '''
+
     for i in range(len(buttons_arr_act)):
         if buttons_arr_act[i]:
             collisions = pygame.sprite.spritecollide(player, platforms_S, False)
@@ -297,7 +293,7 @@ while running:
                     player.on_ground = True
                     player.y_velocity = 0
             platforms_S.draw(screen)
-
+    buttons_arr_act.clear()
 
     for door in doors:
         if door.rect.colliderect(player.rect):
@@ -313,7 +309,7 @@ while running:
                 if current_level < len(levels):
                     levels[current_level]()
                 else:
-                    time.sleep(0.5)
+                    time.sleep(1)
                     print("Well played")
                     running = False
 
