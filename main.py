@@ -27,6 +27,9 @@ GREEN = (0, 255, 0)
 BROWN = (139, 69, 19)
 GRAY = (128, 128, 128)
 
+
+# Death count
+
 # Default keyboard settings
 
 keys_user = {"left_key": pygame.K_q,
@@ -73,7 +76,7 @@ def load_level_1():
     global player, platforms, platforms_S, buttons, doors, spikes_group, t_launch, buttons_arr_act
     player.spawn()
     platforms = pygame.sprite.Group()
-    platform_1 = Platform(0, screen_height - 70, screen_width, 100)  #Ground
+    platform_1 = Platform(0, screen_height - 70, screen_width, 100)  # Ground
     platform_2 = Platform(200, 700, 200, 5)
     platform_3 = Platform(500, 800, 150, 5)
     platform_4 = Platform(875, 630, 100, 5)
@@ -120,11 +123,81 @@ def load_level_2():
     spikes_group.add(spikes1)
     t_launch = pygame.time.get_ticks()
 
+def load_level_3():
+    global player, platforms, platforms_S, buttons, doors, spikes_group, t_launch
+    player.spawn()
+    platforms = pygame.sprite.Group()
+    platform_1 = Platform(0, screen_height - 70, screen_width, 100)
+    platform_2 = Platform(300, 600, 200, 5)
+    platform_3 = Platform(600, 700, 150, 5)
+    platform_4 = Platform(900, 600, 200, 5)
+    platforms.add(platform_1, platform_2, platform_3,platform_4)
+    platforms_S = pygame.sprite.Group()
+    platform_S_1 = Platform(950, 380, 50, 5)
+    platforms_S.add(platform_S_1)
+    buttons = pygame.sprite.Group()
+    button0 = Button(350, 570, 20, 30, RED)
+    buttons_arr_act.clear()
+    buttons.add(button0)
+    doors = pygame.sprite.Group()
+    door1 = Door(1200, 150)
+    doors.add(door1)
+    spikes_group = pygame.sprite.Group()
+    spikes1 = Spikes(platform_3, 20, 30, 220, screen)
+    spikes2 = Spikes(platform_S_1, 20, 30, 220, screen)
+
+    spikes_group.add(spikes1,spikes2)
+    t_launch = pygame.time.get_ticks()
+
+def load_level_4():
+    global player, platforms, platforms_S, buttons, doors, spikes_group, t_launch, buttons_arr_act
+    player.spawn()
+    platforms = pygame.sprite.Group()
+    platform_1 = Platform(0, screen_height - 70, screen_width, 100)  # Ground
+    platform_2 = Platform(200, 200, 100, 5)
+    platform_3 = Platform(200, 400, 100, 5)
+    platform_4 = Platform(200, 630, 100, 5)
+    platforms.add(platform_1, platform_2, platform_3, platform_4)
+    platforms_S = pygame.sprite.Group()
+    platform_S_1 = Platform(800, 430, 100, 5)
+    platforms_S.add(platform_S_1)
+    buttons = pygame.sprite.Group()
+    button0 = Button(250, 170, 20, 30, RED)
+    buttons_arr_act = []
+    buttons.add(button0)
+    doors = pygame.sprite.Group()
+    door1 = Door(1350, 330)
+    doors.add(door1)
+    t_launch = pygame.time.get_ticks()
+
+def load_level_5():
+    global player, platforms, platforms_S, buttons, doors, spikes_group, t_launch, buttons_arr_act
+    player.spawn()
+    reverse()
+    platforms = pygame.sprite.Group()
+    platform_1 = Platform(100, screen_height - 70, screen_width-200, 100)  #Ground
+    platform_2 = Platform(200, 700, 200, 5)
+    platform_4 = Platform(1000, 530, 200, 5)
+    platforms.add(platform_1, platform_2, platform_4)
+    platforms_S = pygame.sprite.Group()
+    platform_S_1 = Platform(500, 500, 50, 5)
+    platforms_S.add(platform_S_1)
+    buttons = pygame.sprite.Group()
+    button0 = Button(250, 670, 20, 30, RED)
+    buttons_arr_act = []
+    buttons.add(button0)
+    doors = pygame.sprite.Group()
+    door1 = Door(1100, 430)
+    doors.add(door1)
+    spikes_group = pygame.sprite.Group()
+    spikes1 = Spikes(platform_4, 20, 30, 220, screen)
+    spikes_group.add(spikes1)
+    t_launch = pygame.time.get_ticks()
 
 # List of levels
 
 
-levels = [load_level_1, load_level_2]
+levels = [load_level_1, load_level_2,load_level_3,load_level_4,load_level_5]
 current_level = 0
 
 # Load the first level
