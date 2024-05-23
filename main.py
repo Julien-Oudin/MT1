@@ -1,6 +1,6 @@
+import time
 import pygame
 import sys
-import datetime as dt
 from Classes.Player import Player
 from Classes.Platform import Platform
 from Classes.Button import Button
@@ -19,8 +19,6 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("More than 1")
 bg = pygame.image.load("Images\Bg.png")
 bg = pygame.transform.scale(bg, (screen_width, screen_height))
-bg_total = pygame.image.load("Images\Bg_total.png")
-bg_total = pygame.transform.scale(bg_total, (screen_width, screen_height))
 
 
 # Colors
@@ -32,9 +30,6 @@ GREEN = (0, 255, 0)
 BROWN = (139, 69, 19)
 GRAY = (128, 128, 128)
 
-
-# Death count
-
 # Default keyboard settings
 
 keys_user = {"left_key": pygame.K_q,
@@ -45,9 +40,6 @@ keys_user = {"left_key": pygame.K_q,
 
 # Initialisation of the state of the projectile
 projectile_launched = False
-
-# Environment properties
-hour = dt.datetime.now().hour
 
 # Create player object
 
@@ -73,6 +65,11 @@ doors = pygame.sprite.Group()
 # Create a group of spikes and puts the first one in it
 spikes_group = pygame.sprite.Group()
 
+# Create the projectiles group
+projectiles_group = pygame.sprite.Group()
+
+
+# Below are functions to load all the levels, they are used to switch to the next one
 
 # Function to load level 1
 
@@ -127,6 +124,7 @@ def load_level_2():
     spikes1 = Spikes(platform_3, 20, 30, 220, screen)
     spikes_group.add(spikes1)
     t_launch = pygame.time.get_ticks()
+
 
 def load_level_3():
     global player, platforms, platforms_S, buttons, doors, spikes_group, t_launch
@@ -259,6 +257,8 @@ while running:
         player.dash()
     if keys[keys_user["jump_key"]]:
         player.jump()
+    if keys[pygame.K_ESCAPE]:
+        running = False
 
     # Check for collisions with platforms
     collisions = pygame.sprite.spritecollide(player, platforms, False)
@@ -298,6 +298,7 @@ while running:
                     player.y_velocity = 0
             platforms_S.draw(screen)
 
+
     for door in doors:
         if door.rect.colliderect(player.rect):
             screen.blit(text, (player.rect.centerx - 125, player.rect.top - 120))
@@ -312,7 +313,8 @@ while running:
                 if current_level < len(levels):
                     levels[current_level]()
                 else:
-                    ###################################################### END
+                    time.sleep(0.5)
+                    print("Well played")
                     running = False
 
     player.update()
@@ -327,6 +329,7 @@ while running:
         if music_state > 3:
             music_state = 0
         pygame.mixer.music.load(music_loop[music_state])
+        pygame.mixer.music.play()
     clock.tick(60)
     if player.rect.y + player.rect.height >= screen_height:
         player.spawn()
