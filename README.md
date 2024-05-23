@@ -10,8 +10,6 @@ Jump - SPACE
 
 Dash - left SHIFT
 
-Pause - Echap
-
 move to the left -Q
 
 move to the right - D
@@ -30,6 +28,8 @@ Open the door - E
 # Credits
 
 ### Art:
+
+Axel PASQUET--SALETES
 
 ### Music:
 Aleotona
