@@ -17,6 +17,11 @@ screen_width = 1600
 screen_height = 900
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("More than 1")
+bg = pygame.image.load("Images\Bg.png")
+bg = pygame.transform.scale(bg, (screen_width, screen_height))
+bg_total = pygame.image.load("Images\Bg_total.png")
+bg_total = pygame.transform.scale(bg_total, (screen_width, screen_height))
+
 
 # Colors
 WHITE = (255, 255, 255)
@@ -106,7 +111,7 @@ def load_level_2():
     platforms = pygame.sprite.Group()
     platform_1 = Platform(0, screen_height - 70, screen_width, 100)
     platform_2 = Platform(300, 600, 200, 5)
-    platform_3 = Platform(600, 700, 150, 5)
+    platform_3 = Platform(600, 900, 150, 5)
     platforms.add(platform_1, platform_2, platform_3)
     platforms_S = pygame.sprite.Group()
     platform_S_1 = Platform(750, 650, 50, 5)
@@ -230,12 +235,13 @@ music_state = 0
 pygame.mixer.music.load(music_loop[music_state])
 pygame.mixer.music.play()
 
+
+
 # Main loop
 running = True
 t_launch = pygame.time.get_ticks()
 while running:
-    screen.fill(WHITE)
-
+    screen.fill((30, 15, 1))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -308,6 +314,7 @@ while running:
                 else:
                     ###################################################### END
                     running = False
+
     player.update()
     buttons.update()
     buttons.draw(screen)

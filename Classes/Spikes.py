@@ -45,4 +45,4 @@ class Spikes(pygame.sprite.Sprite):
                               self.sub_platform.rect.y + 1),
                              (self.rect.x + ((i+1)*self.length_spike) + self.border_distance/2,
                               self.sub_platform.rect.y + 1)]
-            pygame.draw.polygon(self.screen, (128, 128, 128), spike_corners)
+            pygame.draw.polygon(self.screen, (35, 35, 35), spike_corners)
