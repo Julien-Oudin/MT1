@@ -87,7 +87,7 @@ def load_level_1():
     platform_S_1 = Platform(650, 730, 50, 5)
     platforms_S.add(platform_S_1)
     buttons = pygame.sprite.Group()
-    button0 = Button(250, 670, 20, 30, RED)
+    button0 = Button(250, 670, 20, 30)
     buttons_arr_act = []
     buttons.add(button0)
     doors = pygame.sprite.Group()
@@ -114,7 +114,7 @@ def load_level_2():
     platform_S_1 = Platform(750, 650, 50, 5)
     platforms_S.add(platform_S_1)
     buttons = pygame.sprite.Group()
-    button0 = Button(350, 570, 20, 30, RED)
+    button0 = Button(350, 570, 20, 30)
     buttons_arr_act.clear()
     buttons.add(button0)
     doors = pygame.sprite.Group()
@@ -139,7 +139,7 @@ def load_level_3():
     platform_S_1 = Platform(950, 380, 50, 5)
     platforms_S.add(platform_S_1)
     buttons = pygame.sprite.Group()
-    button0 = Button(350, 570, 20, 30, RED)
+    button0 = Button(350, 570, 20, 30)
     buttons_arr_act.clear()
     buttons.add(button0)
     doors = pygame.sprite.Group()
@@ -166,7 +166,7 @@ def load_level_4():
     platform_S_1 = Platform(800, 430, 100, 5)
     platforms_S.add(platform_S_1)
     buttons = pygame.sprite.Group()
-    button0 = Button(250, 170, 20, 30, RED)
+    button0 = Button(250, 150, 20, 30)
     buttons_arr_act = []
     buttons.add(button0)
     doors = pygame.sprite.Group()
@@ -188,7 +188,7 @@ def load_level_5():
     platform_S_1 = Platform(500, 500, 50, 5)
     platforms_S.add(platform_S_1)
     buttons = pygame.sprite.Group()
-    button0 = Button(250, 670, 20, 30, RED)
+    button0 = Button(250, 670, 20, 30)
     buttons_arr_act = []
     buttons.add(button0)
     doors = pygame.sprite.Group()
@@ -202,7 +202,7 @@ def load_level_5():
 # List of levels
 
 
-levels = [load_level_1, load_level_2,load_level_3,load_level_4,load_level_5]
+levels = [load_level_1, load_level_2, load_level_3, load_level_4, load_level_5]
 current_level = 0
 
 # Load the first level

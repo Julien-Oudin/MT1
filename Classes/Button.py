@@ -5,11 +5,13 @@ GREEN = (0, 255, 0)
 
 # Class that creates a button
 class Button(pygame.sprite.Sprite):
-    def __init__(self, x, y, width, height, color):
+    def __init__(self, x, y, width, height):
         super().__init__()
-        self.original_image = pygame.Surface((width, height))
-        self.original_image.fill(color)
+        self.original_image = pygame.image.load("Images\Button_disabled.png")
+        self.original_image = pygame.transform.scale(self.original_image, (width+10, height+10))
         self.image = self.original_image.copy()
+        self.image_enabled = pygame.image.load("Images\Button_enabled.png")
+        self.image_enabled = pygame.transform.scale(self.image_enabled, (width+10, height+10))
         self.original_rect = self.image.get_rect(topleft=(x, y))
         self.rect = self.original_rect.copy()
         self.original_x = x
@@ -24,9 +26,9 @@ class Button(pygame.sprite.Sprite):
         self.reset_image()
 
         if self.triggered:
-            self.image.fill(GREEN)  # Change the button's color to red when triggered
+            self.image = self.image_enabled  # Change the button's sprite
         else:
-            self.image.fill(RED)  # Change the button's color to green when not triggered
+            self.image = self.image_enabled  # Change the button's sprite back
 
     def touch_player(self, character):
         if not self.triggered:
